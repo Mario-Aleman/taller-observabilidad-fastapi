@@ -1,0 +1,89 @@
+POST válido                                  -> HTTP 201 | {"id":1,"estudiante":{"nombre":"Ana","programa":"Sistemas","semestre":5,"promedio":4.2},"i
+POST semestre=-5                             -> HTTP 422 | {"detail":"Datos inválidos","errores":["body.semestre: Input should be greater than or equ
+POST promedio=99                             -> HTTP 422 | {"detail":"Datos inválidos","errores":["body.promedio: Input should be less than or equal 
+POST nombre vacío                            -> HTTP 422 | {"detail":"Datos inválidos","errores":["body.nombre: String should have at least 2 charact
+POST promedio=NaN                            -> HTTP 422 | {"detail":"Datos inválidos","errores":["body.nombre: String should have at least 2 charact
+GET existente                                -> HTTP 200 | {"id":1,"nombre":"Ana","programa":"Sistemas","semestre":5,"promedio":4.2}
+GET inexistente                              -> HTTP 404 | {"detail":"Estudiante no encontrado"}
+POST con API externa caída                   -> HTTP 201 | {"id":2,"estudiante":{"nombre":"Ana","programa":"Sistemas","semestre":5,"promedio":4.2},"i
+POST con API externa lenta (timeout)         -> HTTP 201 | {"id":3,"estudiante":{"nombre":"Ana","programa":"Sistemas","semestre":5,"promedio":4.2},"i
+Traceback (most recent call last):
+  File "/home/claude/proyecto/repositories/estudiante_repository.py", line 37, in listar
+    with closing(_conectar()) as conexion:
+                 ^^^^^^^^^^^
+  File "/home/claude/proyecto/repositories/estudiante_repository.py", line 14, in _conectar
+    return sqlite3.connect(DB, timeout=5)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.OperationalError: unable to open database file
+GET con BD inaccesible                       -> HTTP 503 | {"detail":"Servicio de datos no disponible"}
+Traceback (most recent call last):
+  File "/home/claude/proyecto/middleware_observabilidad.py", line 32, in medir_solicitud
+    respuesta = await call_next(request)
+                ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/starlette/middleware/base.py", line 173, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/usr/local/lib/python3.12/dist-packages/starlette/middleware/base.py", line 149, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/usr/local/lib/python3.12/dist-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/usr/local/lib/python3.12/dist-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.12/dist-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/usr/local/lib/python3.12/dist-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.12/dist-packages/starlette/routing.py", line 676, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.12/dist-packages/fastapi/routing.py", line 2786, in app
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.12/dist-packages/fastapi/routing.py", line 1817, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "/usr/local/lib/python3.12/dist-packages/fastapi/routing.py", line 2869, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "/usr/local/lib/python3.12/dist-packages/fastapi/routing.py", line 1843, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.12/dist-packages/fastapi/routing.py", line 1308, in handle
+    await effective_context.app(scope, receive, send)
+  File "/usr/local/lib/python3.12/dist-packages/fastapi/routing.py", line 165, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/usr/local/lib/python3.12/dist-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.12/dist-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/usr/local/lib/python3.12/dist-packages/fastapi/routing.py", line 151, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/fastapi/routing.py", line 727, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/fastapi/routing.py", line 362, in run_endpoint_function
+    return await run_in_threadpool(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/starlette/concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/anyio/to_thread.py", line 65, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/anyio/_backends/_asyncio.py", line 2706, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/anyio/_backends/_asyncio.py", line 1100, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/fastapi/telemetry/_api.py", line 240, in _run_sync_endpoint
+    return function(**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/proyecto/routes/estudiantes.py", line 18, in listar_estudiantes
+    return [_a_dict(f) for f in obtener_estudiantes()]
+                                ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/unittest/mock.py", line 1134, in __call__
+    return self._mock_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/unittest/mock.py", line 1138, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/unittest/mock.py", line 1193, in _execute_mock_call
+    raise effect
+RuntimeError: x
+GET con excepción inesperada                 -> HTTP 500 | {"detail":"Error interno del servidor","id_solicitud":"29dc7833"}

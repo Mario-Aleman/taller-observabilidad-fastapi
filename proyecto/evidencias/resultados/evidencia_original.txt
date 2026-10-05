@@ -1,0 +1,21 @@
+--- H5: BD sin inicializar (app recién arrancada) ---
+GET /estudiantes/ sin tabla                  -> HTTP 500 | Internal Server Error
+
+--- Validación (API externa simulada OK) ---
+POST semestre=-5                             -> HTTP 200 | {"id":1,"estudiante":{"nombre":"Ana","programa":"Sistemas","semestre":-5,"promedio":4.2},"
+POST promedio=99                             -> HTTP 200 | {"id":2,"estudiante":{"nombre":"Ana","programa":"Sistemas","semestre":5,"promedio":99.0},"
+POST nombre vacío                            -> HTTP 200 | {"id":3,"estudiante":{"nombre":"","programa":"Sistemas","semestre":5,"promedio":4.2},"info
+POST promedio=NaN                            -> HTTP 500 | Internal Server Error
+POST campo faltante                          -> HTTP 422 | {"detail":[{"type":"missing","loc":["body","programa"],"msg":"Field required","input":{"no
+POST válido (código de creación)             -> HTTP 200 | {"id":4,"estudiante":{"nombre":"Ana","programa":"Sistemas","semestre":5,"promedio":4.2},"i
+POST duplicado exacto                        -> HTTP 200 | {"id":5,"estudiante":{"nombre":"Ana","programa":"Sistemas","semestre":5,"promedio":4.2},"i
+
+--- H4: recurso inexistente ---
+GET /estudiantes/99999                       -> HTTP 200 | {"mensaje":"Estudiante no encontrado"}
+
+--- H2: API externa caída / respuesta inválida ---
+POST con API externa caída                   -> HTTP 500 | Internal Server Error
+Registros en BD antes=5 después=6 -> se guardó aunque el cliente recibió error
+
+--- H6: formato de la lista (GET /estudiantes/) ---
+[[1,"Ana","Sistemas",-5,4.2],[2,"Ana","Sistemas",5,99.0],[3,"","Sistemas",5,4.2],[4,"Ana","Sistemas"
